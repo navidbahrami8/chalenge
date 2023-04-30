@@ -2,14 +2,11 @@ import {Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef
 import {Observable, Subject} from "rxjs";
 import {Store} from "@ngrx/store";
 import {selectUsers} from "./+store/users.selectors";
-import {takeUntil} from "rxjs/operators";
 import {getUsers} from "./+store/users.actions";
-import * as fromActions from "./+store/users.actions";
 import {usersArray, UsersData} from "./+store/users.interface";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSelectChange} from "@angular/material/select";
-import {MatDrawer} from "@angular/material/sidenav";
 import {DateAdapter} from "@angular/material/core";
 import {DatePipe} from "@angular/common";
 
@@ -127,17 +124,21 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedGender($event: any, item: string) {
     if (item && $event.checked) {
       this.arrayAge.push(item)
-      let filterSmaller = this.usersArray.filter((x: any) => (this.arrayAge.some(x => x == 'male') ? x.gender == 'male' : null) || (this.arrayAge.some(x => x == 'female') ? x.gender == 'female' : null) || (this.arrayAge.some(x => x == 'other') ? x.gender == 'other' : null))
+      let filterSmaller = this.dataFilterAge()
       this.dataSource = new MatTableDataSource(filterSmaller);
     } else {
       const index = this.arrayAge.indexOf(item, 0);
       if (index > -1) {
         this.arrayAge.splice(index, 1);
       }
-      let filterSmaller = this.usersArray.filter((x: any) => (this.arrayAge.some(x => x == 'male') ? x.gender == 'male' : null) || (this.arrayAge.some(x => x == 'female') ? x.gender == 'female' : null) || (this.arrayAge.some(x => x == 'other') ? x.gender == 'other' : null))
+      let filterSmaller = this.dataFilterAge()
       this.dataSource = new MatTableDataSource(filterSmaller);
     }
     this.arrayAge === undefined || this.arrayAge.length == 0 ? this.initUsers() : null
+  }
+
+  dataFilterAge() {
+    return this.usersArray.filter((x: any) => (this.arrayAge.some(x => x == 'male') ? x.gender == 'male' : null) || (this.arrayAge.some(x => x == 'female') ? x.gender == 'female' : null) || (this.arrayAge.some(x => x == 'other') ? x.gender == 'other' : null))
   }
 
   arrayColor: string [] = []
@@ -146,22 +147,27 @@ export class UsersComponent implements OnInit, OnDestroy, AfterViewInit {
     // 'Green', 'Brown', 'Gray'
     if (item && $event.checked) {
       this.arrayColor.push(item)
-      let filterSmaller = this.usersArray.filter((x: any) => (this.arrayColor.some(x => x == 'Green') ? x.eyeColor == 'Green' : null) || (this.arrayColor.some(x => x == 'Brown') ? x.eyeColor == 'Brown' : null) || (this.arrayColor.some(x => x == 'Gray') ? x.eyeColor == 'Gray' : null))
+      let filterSmaller = this.getFilterEyeColor()
       this.dataSource = new MatTableDataSource(filterSmaller);
     } else {
       const index = this.arrayColor.indexOf(item, 0);
       if (index > -1) {
         this.arrayColor.splice(index, 1);
       }
-      let filterSmaller = this.usersArray.filter((x: any) => (this.arrayColor.some(x => x == 'Green') ? x.eyeColor == 'Green' : null) || (this.arrayColor.some(x => x == 'Brown') ? x.eyeColor == 'Brown' : null) || (this.arrayColor.some(x => x == 'Gray') ? x.eyeColor == 'Gray' : null))
+      let filterSmaller = this.getFilterEyeColor()
       this.dataSource = new MatTableDataSource(filterSmaller);
     }
     this.arrayColor === undefined || this.arrayColor.length == 0 ? this.initUsers() : null
   }
 
+  getFilterEyeColor() {
+    return this.usersArray.filter((x: any) => (this.arrayColor.some(x => x == 'Green') ? x.eyeColor == 'Green' : null) || (this.arrayColor.some(x => x == 'Brown') ? x.eyeColor == 'Brown' : null) || (this.arrayColor.some(x => x == 'Gray') ? x.eyeColor == 'Gray' : null))
+
+  }
+
   selectedDate($event: any) {
     let date = this.datePipe.transform(new Date(($event.target as HTMLInputElement).value).toISOString(), 'yyyy-MM-dd');
-    console.log(date , 'date')
+    console.log(date, 'date')
     const filterValue = date
     if (filterValue) {
       let filter = this.usersArray.filter((x: any) => x.birthDate == filterValue)
